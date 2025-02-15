@@ -1,5 +1,5 @@
 import QRCode from "react-qr-code"
-import { Box, Button, Card, Container, Stack, TextField, Typography, Grid2 as Grid, CardMedia, CardContent, CardHeader } from "@mui/material"
+import { Box, Button, Container, Stack, TextField, Typography, Grid2 as Grid } from "@mui/material"
 import { useState } from "react"
 import { useTheme} from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
