@@ -3,10 +3,12 @@ import { Box, Button, Container, Stack, TextField, Typography, Grid2 as Grid } f
 import { useState } from "react"
 import { useTheme} from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
+import { AboutModal } from "@/components/about-modal"
 
 export default function Home() {
   const [codeString, setCodeString] = useState("")
   const [codes, setCodes] = useState<string[]>([])
+  const [errorLines, setErrorLines] = useState<string[]>([])
   const [currentCodeIndex, setCurrentCodeIndex] = useState(0)
   const { breakpoints } = useTheme()
 
@@ -19,6 +21,8 @@ export default function Home() {
     const value = event.target.value;
     const rawCodes = value.split("\n");
     const codes = rawCodes.filter(code => code.trim() !== "" && code.length === 16 && code.split("-").length === 4);
+    const linesWithErrors = rawCodes.filter(code => code.trim() !== "" && code.length !== 16 || code.split("-").length !== 4 && code !== "");
+    setErrorLines(linesWithErrors);
     setCodeString(value);
     setCodes(codes);
   }
@@ -33,15 +37,16 @@ export default function Home() {
     <>
       <Container>
         <Typography
-          variant="h4"
+          variant="h5"
           sx={{
             textAlign: "center",
             marginTop: 4,
             marginBottom: 3
           }}
         >
-          Pokemon TCG Live Code Parser
+          Pokemon TCG Live QR Code Generator
         </Typography>
+        <AboutModal />
         <Typography
           variant="subtitle1"
           sx={{
@@ -49,7 +54,7 @@ export default function Home() {
             marginBottom: { xs: 4, md: 8 }
           }}
         >
-          Paste your codes in the text area below. Each code must be on a new line and have a length of 16 characters.
+          Paste your codes in the text area below. Each code must be on a new line and have a length of 16 characters, following the format: <code>XXX-XXXX-XXX-XXX</code>
         </Typography>
         <Grid container spacing={4} justifyContent={"center"}>
           <Grid size={{ xs: 12, md: 6 }}>
@@ -64,6 +69,8 @@ export default function Home() {
               value={codeString}
               onChange={handleInputChange}
               rows={isMobile ? 10 : 20}
+              error={errorLines.length > 0}
+              helperText={errorLines.length > 0 && `Each line must have the following format: XXX-XXXX-XXX-XXX, lines with errors: ${errorLines.join(", ")}`}
             />
             {codes.length > 0 && (
             <>
