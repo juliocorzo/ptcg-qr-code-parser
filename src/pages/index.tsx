@@ -1,6 +1,6 @@
 import QRCode from "react-qr-code"
 import { Box, Button, Container, Stack, TextField, Typography, Grid2 as Grid } from "@mui/material"
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useTheme} from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { AboutModal } from "@/components/about-modal"
@@ -12,10 +12,10 @@ export default function Home() {
   const [currentCodeIndex, setCurrentCodeIndex] = useState(0)
   const { breakpoints } = useTheme()
 
-  const isMobile = useMediaQuery(breakpoints.down("md"))
+  const nextButtonRef = useRef<HTMLButtonElement>(null)
+  const prevButtonRef = useRef<HTMLButtonElement>(null)
 
-  console.log(codeString);
-  console.log(codes);
+  const isMobile = useMediaQuery(breakpoints.down("md"))
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -32,6 +32,29 @@ export default function Home() {
     setCodes([]);
     setCurrentCodeIndex(0);
   }
+
+  useEffect(() => {
+    const handleNextKeydown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowRight") {
+        if (currentCodeIndex < codes.length - 1) {
+          nextButtonRef.current?.focus();
+          // nextButtonRef.current?.click();
+          setCurrentCodeIndex((prevIndex) => Math.min(prevIndex + 1, codes.length - 1));
+        }
+      }
+      if (event.key === "ArrowLeft") {
+        if (currentCodeIndex > 0) {
+          prevButtonRef.current?.focus();
+          // prevButtonRef.current?.click();
+          setCurrentCodeIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+        }
+      }
+    }
+    window.addEventListener("keydown", handleNextKeydown);
+    return () => {
+      window.removeEventListener("keydown", handleNextKeydown);
+    }
+  }, [codes, currentCodeIndex]);
 
   return (
     <>
@@ -58,7 +81,6 @@ export default function Home() {
         </Typography>
         <Grid container spacing={4} justifyContent={"center"}>
           <Grid size={{ xs: 12, md: 6 }}>
-
             <TextField 
               label="QR Code List"
               sx={{ 
@@ -75,26 +97,29 @@ export default function Home() {
             {codes.length > 0 && (
             <>
               <Stack direction="row" justifyContent={"center"} spacing={2} marginTop={2}>
-              <Button
-                  variant="contained"
-                  color="warning"
+                <Button
+                  variant="outlined"
+                  color="error"
                   onClick={handleClear}
                 >
                   Clear
                 </Button>
                 <Button
-                  variant="contained"
+                  variant="outlined"
                   color="primary"
                   onClick={() => setCurrentCodeIndex(currentCodeIndex - 1)}
                   disabled={currentCodeIndex === 0}
+                  ref={prevButtonRef}
                 >
-                  Previous
+                  Prev.
                 </Button>
                 <Button 
                   variant="contained" 
                   color="primary"
                   onClick={() => setCurrentCodeIndex(currentCodeIndex + 1)}
                   disabled={currentCodeIndex === codes.length - 1}
+                  fullWidth
+                  ref={nextButtonRef}
                 >
                   Next
                 </Button>
@@ -116,6 +141,9 @@ export default function Home() {
                 >
                   {codes[currentCodeIndex]}
                 </Typography>
+                <Typography variant="subtitle1" sx={{ marginRight: 2 }}>
+                {`${currentCodeIndex + 1} of ${codes.length}`}
+              </Typography>
               </Box>
             </>
           )}
