@@ -1,10 +1,8 @@
 import QRCode from "react-qr-code"
-import { Box, Button, Container, Stack, TextField, Typography, Grid2 as Grid, IconButton } from "@mui/material"
+import { Box, Button, Container, Stack, TextField, Typography, Grid2 as Grid } from "@mui/material"
 import { useState, useEffect, useRef } from "react"
 import { useTheme} from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import ClearIcon from '@mui/icons-material/Clear';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { AboutModal } from "@/components/about-modal"
 
