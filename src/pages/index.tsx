@@ -1,8 +1,11 @@
 import QRCode from "react-qr-code"
-import { Box, Button, Container, Stack, TextField, Typography, Grid2 as Grid } from "@mui/material"
+import { Box, Button, Container, Stack, TextField, Typography, Grid2 as Grid, IconButton } from "@mui/material"
 import { useState, useEffect, useRef } from "react"
 import { useTheme} from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
+import ClearIcon from '@mui/icons-material/Clear';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { AboutModal } from "@/components/about-modal"
 
 export default function Home() {
@@ -58,29 +61,29 @@ export default function Home() {
 
   return (
     <>
-      <Container>
+      <Container maxWidth="lg">
         <Typography
           variant="h5"
           sx={{
             textAlign: "center",
             marginTop: 4,
-            marginBottom: 3
           }}
         >
-          Pokemon TCG Live QR Code Generator
+          QR Code Generator
         </Typography>
-        <AboutModal />
         <Typography
-          variant="subtitle1"
+          variant="h6"
           sx={{
             textAlign: "center",
-            marginBottom: { xs: 4, md: 8 }
+            marginBottom: 3
           }}
+          color="textSecondary"
         >
-          Paste your codes in the text area below. Each code must be on a new line and have a length of 16 characters, following the format: <code>XXX-XXXX-XXX-XXX</code>
+          For Pokemon TCG Live Code Cards
         </Typography>
-        <Grid container spacing={4} justifyContent={"center"}>
-          <Grid size={{ xs: 12, md: 6 }}>
+        <AboutModal />
+        <Grid container spacing={4} justifyContent={"center"} marginTop={8}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <TextField 
               label="QR Code List"
               sx={{ 
@@ -90,17 +93,42 @@ export default function Home() {
               multiline
               value={codeString}
               onChange={handleInputChange}
-              rows={isMobile ? 10 : 20}
+              rows={isMobile ? 2 : 20}
               error={errorLines.length > 0}
-              helperText={errorLines.length > 0 && `Each line must have the following format: XXX-XXXX-XXX-XXX, lines with errors: ${errorLines.join(", ")}`}
+              helperText={
+                errorLines.length > 0 
+                  ? `Each line must have the following format: XXX-XXXX-XXX-XXX. Lines with errors: ${errorLines.join(", ")}`
+                  : "Each line must have the following format: XXX-XXXX-XXX-XXX"
+                }
             />
+            {/* Mobile QR Code */}
+            {codes.length > 0 && isMobile && (
+            <>
+              <Box sx={{ textAlign: "center", marginTop: { sm: 4, md: 0 }, marginBottom: 4 }}>
+                {/* <Typography variant="h3" sx={{ marginBottom: 8 }}>{codes[currentCodeIndex]}</Typography> */}
+                <QRCode size={isMobile ? 350 : 500} value={codes[currentCodeIndex]} level="H" />
+                <Typography 
+                  variant="h5"
+                  sx={{ marginTop: 4 }}
+                  fontFamily={"monospace"}
+                >
+                  {codes[currentCodeIndex]}
+                </Typography>
+                <Typography variant="subtitle1" sx={{ marginRight: 2 }}>
+                {`${currentCodeIndex + 1} of ${codes.length}`}
+              </Typography>
+              </Box>
+            </>
+          )}
             {codes.length > 0 && (
             <>
-              <Stack direction="row" justifyContent={"center"} spacing={2} marginTop={2}>
+              <Stack direction="row" justifyContent={"center"} spacing={2} >
                 <Button
                   variant="outlined"
                   color="error"
                   onClick={handleClear}
+                  // startIcon={<ClearIcon />}
+                  sx={{ width: "20%" }}
                 >
                   Clear
                 </Button>
@@ -110,6 +138,7 @@ export default function Home() {
                   onClick={() => setCurrentCodeIndex(currentCodeIndex - 1)}
                   disabled={currentCodeIndex === 0}
                   ref={prevButtonRef}
+                  sx={{ width: "20%", padding: 0 }}
                 >
                   Prev.
                 </Button>
@@ -118,8 +147,9 @@ export default function Home() {
                   color="primary"
                   onClick={() => setCurrentCodeIndex(currentCodeIndex + 1)}
                   disabled={currentCodeIndex === codes.length - 1}
-                  fullWidth
                   ref={nextButtonRef}
+                  endIcon={<ArrowForwardIcon />}
+                  sx={{ width: "60%" }}
                 >
                   Next
                 </Button>
@@ -129,11 +159,12 @@ export default function Home() {
           </Grid>
           <Grid size={{ xs: 12, md: 6 }} sx={{ marginTop: { xs: 4, md: 0 } }}>
           <Box>
-          {codes.length > 0 && (
+          {/* Desktop QR code */}
+          {codes.length > 0 && !isMobile && (
             <>
               <Box sx={{ textAlign: "center", marginTop: { sm: 4, md: 0 } }}>
                 {/* <Typography variant="h3" sx={{ marginBottom: 8 }}>{codes[currentCodeIndex]}</Typography> */}
-                <QRCode size={500} value={codes[currentCodeIndex]} level="H" />
+                <QRCode size={isMobile ? 350 : 500} value={codes[currentCodeIndex]} level="H" />
                 <Typography 
                   variant="h5"
                   sx={{ marginTop: 4 }}
